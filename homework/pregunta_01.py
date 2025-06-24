@@ -4,7 +4,8 @@
 """
 Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 """
-
+import pandas as pd
+from pathlib import Path
 
 def pregunta_01():
     """
@@ -71,3 +72,21 @@ def pregunta_01():
 
 
     """
+    base_path = Path('files') / 'input'
+    output_path = Path('files') / 'output'
+    output_path.mkdir(parents=True, exist_ok=True)
+
+    for split in ['train', 'test']:
+        records = []
+        split_path = base_path / split
+        for sentiment in ['negative', 'neutral', 'positive']:
+            sentiment_path = split_path / sentiment
+            for txt_file in sentiment_path.glob('*.txt'):
+                text = txt_file.read_text(encoding='utf-8').strip()
+                records.append({
+                    'phrase': text,
+                    'target': sentiment
+                })
+        df = pd.DataFrame(records)
+        csv_filename = f"{split}_dataset.csv"
+        df.to_csv(output_path / csv_filename, index=False)
